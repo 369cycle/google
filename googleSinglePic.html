@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+    <title>Google Drive 雲端圖片轉換器</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding:0px 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            border-radius: 10px;
+            border: 3px solid #b8b8b8;
+            line-height: 30px;
+            padding: 10px;
+            margin-right: 10px;
+            background-color: #eae9e8;
+            font-size: 16px;
+        }
+
+        #imageUrlcode {
+            width: 100%;
+            border-radius: 10px;
+            border: 3px solid #f0df5c;
+            line-height: 30px;
+            padding: 10px;
+            margin-right: 10px;
+            background-color: #f7fa66;
+            font-size: 16px;
+            color: #454545;
+        }
+
+        #codeHtml {
+            width: 100%;
+            border-radius: 10px;
+            border: 3px solid #f0df5c;
+            line-height: 30px;
+            padding: 10px;
+            margin-right: 10px;
+            background-color: #f7fa66;
+            height: 100px;
+            font-size: 16px;
+            color: #454545;
+        }
+
+        button {
+            padding: 10px 15px;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .preview {
+            margin-top: 20px;
+            max-width: 400px;
+        }
+
+
+        .mytext {
+            font-size: 17px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <h1>Google Drive 圖片對外連結轉換</h1>
+    <h3>（一）雲端上傳圖片可以用在哪裡？</h3>
+    <div class="w3-row-padding mytext ">
+        <div class="w3-col l4 m6">✅ 可用在不提供圖片上傳的電商平台！</div>
+        <div class="w3-col l4 m6">✅ 可用在有html編輯的電商、部落格，同時曝光！</div>
+        <div class="w3-col l4 m6">✅ 圖片更新後，可以覆蓋舊檔案，利於管理。</div>
+        <div class="w3-col l4 m6">✅ google空間大，流量近乎無限制！</div>
+        <div class="w3-col l4 m6">✅ 無廣告干擾，google不會倒。</div>
+
+        <div class="w3-col l4 m6"></div>
+    </div>
+    <h3>（二）開始行動</h3>
+    <input type="text" id="imageUrl" placeholder="輸入 Google Drive 圖片雲端網址">
+
+    <p>🔥 請記得將圖片點選公開共享檢視，所有瀏覽者才能觀看！</p>
+    <button id="convertButton">轉換</button>
+    <div class="result" id="result"></div>
+    <div class="result" id="resultcode"></div>
+    <div class="preview" id="preview"></div>
+
+    <script>
+        $(document).ready(function () {
+            $("#header").load('header.html');
+            $('#convertButton').click(function () {
+                var url = $('#imageUrl').val();
+                var imageId = url.match(/[-\w]{25,}/); // 提取圖片ID
+                if (imageId) {
+                    var thumbnailUrl = "https://drive.google.com/thumbnail?id=" + imageId[0] + "&sz=w1366";
+                    var HtmlThumbanaiUrl = '<img style="width: 100%; max-width: 100%; height: auto; display: block;" src="' + thumbnailUrl + '">';
+                    var inputThumbnailUrl = '<input type="text" id="imageUrlcode" value="' + thumbnailUrl + '">';
+                    var inputThumbnaiCode = '<textarea name="codeHtml" id="codeHtml">' + HtmlThumbanaiUrl + '</textarea>';
+                    $('#preview').html(HtmlThumbanaiUrl); // 顯示圖片預覽
+                    $('#result').html('<p>可對外連結的圖片網址:</p>' + inputThumbnailUrl); // 顯示轉換後的連結
+                    $('#resultcode').html('<p>圖片HTML語法:</p>' + inputThumbnaiCode); // 顯示轉換後的連結
+                } else {
+                    $('#result').text("請輸入有效的 Google Drive 圖片連結。");
+                    $('#preview').html(''); // 清除預覽
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
