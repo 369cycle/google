@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive 多張圖片轉換器</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 600px;
+            height: 150px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .preview {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        img {
+            max-width: 200px; /* 設定圖片最大寬度 */
+            height: 200px; /* 設定圖片高度 */
+            object-fit: cover; /* 確保圖片覆蓋整個容器並保持比例 */
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Drive 多張圖片轉換器</h1>
+    <textarea id="imageUrls" placeholder="輸入 Google Drive 圖片連結，每行一個或用逗號分隔">
+https://drive.google.com/file/d/13EIc9THkAO5SqdxsMPhSQH_RaN5RGPUM/view?usp=sharing, 
+https://drive.google.com/file/d/13NCcYZTnXx0M6BLKJl-3Wh2vKNMMhkdK/view?usp=sharing, 
+https://drive.google.com/file/d/15H4JUFO3DwpCvZSxBX1sqIerP8IKG90g/view?usp=sharing, 
+https://drive.google.com/file/d/16_OeTLd1VaN6ik4-R1UbPwIWTgKW5a0W/view?usp=sharing, 
+https://drive.google.com/file/d/18KVxEDOGg3hZ5O8t54dE5ZAIkzzgNeyg/view?usp=sharing, 
+https://drive.google.com/file/d/1DfoErXN8qH7YvXabOiMFqjaDATminIoG/view?usp=sharing, 
+https://drive.google.com/file/d/1V0YLcdmcOC0uvc2FFyODWWeoc4l_V6C1/view?usp=sharing, 
+https://drive.google.com/file/d/1dtiVa3MhKPY8ccCerpNSquT1MUdVb6RF/view?usp=sharing, 
+https://drive.google.com/file/d/1jkNX3-6G1OPTQUkceu9Z-S1-j3-YufIX/view?usp=sharing, 
+https://drive.google.com/file/d/1kwxbpwn51EAaIa_gVRvHp_PB_BgU6usl/view?usp=sharing, 
+https://drive.google.com/file/d/1l38PNmqBvoOUMmKFdByNtKXjPayecM4j/view?usp=sharing, 
+https://drive.google.com/file/d/1n7t3Eb-BEPLIF6zDHtMNzxar3KxgqLW6/view?usp=sharing, 
+https://drive.google.com/file/d/1tNGnXR0AIB9vTojkufg75E3hihBkgnme/view?usp=sharing
+    </textarea>
+    <br>
+    <button id="convertButton">轉換</button>
+    <div class="preview" id="preview"></div>
+
+    <script>
+        $(document).ready(function () {
+            function convertUrls() {
+                var urls = $('#imageUrls').val().split(/[\n,]+/); // 以換行或逗號分隔
+                $('#result').empty(); // 清空結果
+                $('#preview').empty(); // 清空預覽
+
+                urls.forEach(function (url) {
+                    var imageId = url.match(/[-\w]{25,}/); // 提取圖片ID
+                    if (imageId) {
+                        var thumbnailUrl = "https://drive.google.com/thumbnail?id=" + imageId[0] + "&sz=w1366";
+
+                        // 新增圖片和複製、查看大圖按鈕
+                        var imageContainer = $('<div class="image-container"></div>');
+                        var imgElement = $('<a data-fancybox="gallery" href="' + thumbnailUrl + '"><img src="' + thumbnailUrl + '" alt="轉換後的圖片預覽"></a>');
+                        var copyButton = $('<p><center><button class="copyButton">複製網址</button> <button class="viewButton">查看大圖</button></center></p>');
+
+                        // 當複製按鈕被點擊時，複製圖片網址
+                        copyButton.find('.copyButton').click(function () {
+                            navigator.clipboard.writeText(thumbnailUrl).then(function () {
+                                alert('已複製網址: ' + thumbnailUrl);
+                            }, function (err) {
+                                alert('複製失敗: ', err);
+                            });
+                        });
+
+                        // 當查看大圖按鈕被點擊時，使用 Fancybox 顯示大圖
+                        copyButton.find('.viewButton').click(function () {
+                            $.fancybox.open({
+                                src: thumbnailUrl,
+                                type: 'image',
+                                opts: {
+                                    caption: '大圖',
+                                    buttons: [
+                                        'close'
+                                    ]
+                                }
+                            });
+                        });
+
+                        imageContainer.append(imgElement).append(copyButton);
+                        $('#preview').append(imageContainer); // 將圖片和按鈕添加到預覽區域
+                    } else {
+                        $('#result').append("無效的連結: " + url + '<br>'); // 顯示無效連結提示
+                    }
+                });
+            }
+
+            $('#convertButton').click(function () {
+                convertUrls(); // 點擊按鈕時執行轉換
+            });
+
+            // 頁面加載時自動執行轉換
+            if ($('#imageUrls').val().trim() !== '') {
+                convertUrls(); // 如果 textarea 不為空，自動執行轉換
+            }
+        });
+    </script>
+</body>
+</html>
